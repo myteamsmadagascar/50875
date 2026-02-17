@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>CRM – Base 6</title>
+<title>CRM â€“ Base 6</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -32,7 +32,7 @@ th{background:#eef3ff;position:sticky;top:0}
 <body>
 
 <header class="row" style="justify-content:space-between;flex-wrap:wrap">
-  <b>CRM – appel manuel</b>
+  <b>CRM â€“ appel manuel</b>
 
   <div class="row" style="flex-wrap:wrap">
     <button onclick="location.href='index.html'"> Index</button>
@@ -57,11 +57,11 @@ th{background:#eef3ff;position:sticky;top:0}
   <button class="danger" onclick="deleteAll()">Tout supprimer</button>
 
   <select id="rangeSelect" onchange="applyRange()">
-    <option value="0">1–100</option><option value="100">101–200</option>
-    <option value="200">201–300</option><option value="300">301–400</option>
-    <option value="400">401–500</option><option value="500">501–600</option>
-    <option value="600">601–700</option><option value="700">701–800</option>
-    <option value="800">801–900</option><option value="900">901–1000</option>
+    <option value="0">1â€“100</option><option value="100">101â€“200</option>
+    <option value="200">201â€“300</option><option value="300">301â€“400</option>
+    <option value="400">401â€“500</option><option value="500">501â€“600</option>
+    <option value="600">601â€“700</option><option value="700">701â€“800</option>
+    <option value="800">801â€“900</option><option value="900">901â€“1000</option>
   </select>
 
   <span class="small">Total : <b id="total">0</b></span>
@@ -71,7 +71,7 @@ th{background:#eef3ff;position:sticky;top:0}
 <table>
 <thead>
 <tr>
-<th>Nom</th><th>Prénom</th><th>Adresse</th><th>Ville</th><th>CP</th>
+<th>Nom</th><th>PrÃ©nom</th><th>Adresse</th><th>Ville</th><th>CP</th>
 <th>Fixe</th><th>Mobile</th><th>RDV</th><th>Rappel</th>
 <th>Statut</th><th>Rep1</th><th>Rep2</th><th>Commentaire</th><th>Actions</th>
 </tr>
@@ -85,7 +85,7 @@ th{background:#eef3ff;position:sticky;top:0}
 <b>Ajouter / Modifier</b>
 <div class="grid">
 <input id="f_nom" placeholder="Nom">
-<input id="f_prenom" placeholder="Prénom">
+<input id="f_prenom" placeholder="PrÃ©nom">
 <input id="f_adresse" placeholder="Adresse">
 <input id="f_ville" placeholder="Ville">
 <input id="f_cp" placeholder="CP">
@@ -94,12 +94,12 @@ th{background:#eef3ff;position:sticky;top:0}
 <input id="f_rdv" type="date">
 <input id="f_rappel" type="date">
 <select id="f_statut">
-<option>À appeler</option><option>RDV</option>
-<option>À rappeler</option><option>Refus</option>
+<option>Ã€ appeler</option><option>RDV</option>
+<option>Ã€ rappeler</option><option>Refus</option>
 <option>Hors cible</option>
 </select>
-<input id="f_rep1" placeholder="Réponse 1">
-<input id="f_rep2" placeholder="Réponse 2">
+<input id="f_rep1" placeholder="RÃ©ponse 1">
+<input id="f_rep2" placeholder="RÃ©ponse 2">
 </div>
 <textarea id="f_commentaire" placeholder="Commentaire"></textarea>
 <div class="row">
@@ -110,7 +110,7 @@ th{background:#eef3ff;position:sticky;top:0}
 
 <!-- IMPORT -->
 <div id="importCard" class="card hidden">
-<b>Import (CSV / TXT / XLS) – Mapping manuel</b>
+<b>Import (CSV / TXT / XLS) â€“ Mapping manuel</b>
 
 <div class="row">
 <select id="fmt">
@@ -134,7 +134,7 @@ th{background:#eef3ff;position:sticky;top:0}
 <span class="small" id="importInfo"></span>
 </div>
 
-<div class="preview" id="preview">Aperçu…</div>
+<div class="preview" id="preview">AperÃ§uâ€¦</div>
 </div>
 
 </div>
@@ -199,7 +199,7 @@ window.editRow=id=>{
   EDIT_ID=id;
   ["nom","prenom","adresse","ville","cp","fixe","mobile","rdv","rappel","rep1","rep2","commentaire"]
   .forEach(k=>$("f_"+k).value=x[k]||"");
-  f_statut.value=x.statut||"À appeler";
+  f_statut.value=x.statut||"Ã€ appeler";
   openForm();
 };
 
@@ -281,7 +281,7 @@ ${importHeaders.map((h,i)=>`<option value="${i}">${h}</option>`).join("")}
 </select>`).join("");
 
   preview.textContent=importRows.slice(0,5).map(r=>r.join(" | ")).join("\n");
-  importInfo.textContent=`${importRows.length} lignes détectées`;
+  importInfo.textContent=`${importRows.length} lignes dÃ©tectÃ©es`;
 };
 
 window.validateImport=async()=>{
@@ -295,11 +295,11 @@ window.validateImport=async()=>{
   for(const r of rows){
     const o={createdAt:serverTimestamp()};
     for(const k in map) o[k]=(r[map[k]]||"").toString().trim();
-    if(!o.statut) o.statut="À appeler";
+    if(!o.statut) o.statut="Ã€ appeler";
     await addDoc(colRef,o);
     n++;
   }
-  importInfo.textContent=`Import terminé : ${n}`;
+  importInfo.textContent=`Import terminÃ© : ${n}`;
 };
 </script>
 </body>
