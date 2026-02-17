@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>CRM – Base 1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+  body{font-family:Arial;margin:0;background:#f4f6fb}
+  header{background:#fff;border-bottom:1px solid #d9dee7;padding:12px}
+  .wrap{max-width:1600px;margin:auto;padding:12px}
+  .card{background:#fff;border:1px solid #d9dee7;border-radius:12px;padding:12px;margin-bottom:12px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button,input,select,textarea{padding:9px;font-size:14px}
+  button{border-radius:10px;border:1px solid #d9dee7;background:#fff;cursor:pointer}
+  .primary{background:#0b57d0;color:#fff;border-color:#0b57d0;font-weight:700}
+  .danger{background:#ef4444;color:#fff;border-color:#ef4444;font-weight:700}
+  .tableWrap{max-height:60vh;overflow:auto;border:1px solid #d9dee7;border-radius:12px}
+  table{width:100%;border-collapse:collapse}
+  th,td{border:1px solid #e6eaf0;padding:6px;font-size:13px;vertical-align:top}
+  th{background:#eef3ff;position:sticky;top:0}
+  .hidden{display:none !important}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+  .map{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:10px}
+  .preview{max-height:140px;overflow:auto;border:1px solid #d9dee7;border-radius:12px;padding:8px;background:#fafafa;font-size:12px;white-space:pre-wrap}
+  .pill{border:1px solid #d9dee7;border-radius:999px;padding:6px 10px;font-size:12px;background:#f8fafc}
+  .small{font-size:12px;color:#556}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="row" style="justify-content:space-between">
+    <div class="row">
+      <b>CRM – BASE 1</b>
+      <span class="pill">Collection : <b>crm_base1</b></span>
+      <span class="pill">Total : <b id="total">0</b></span>
+      <span class="pill" id="rangeLabel">1  100</span>
+      <span class="pill small" id="fb">Firebase : …</span>
+    </div>
+    <div class="row">
+      <button onclick="location.href='index.html'">Retour index</button>
+      <button onclick="location.href='reporting.html'">Reporting</button>
+      <button onclick="location.href='base2.html'">Base 2</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="card row">
+    <button class="primary" onclick="openForm()">Ajouter</button>
+    <button onclick="openImport()">Importer</button>
+    <button onclick="exportCSV()">Exporter CSV</button>
+    <button class="danger" onclick="deleteAll()">Tout supprimer</button>
+
+    <select id="rangeSelect" onchange="applyRange()">
+      <option value="0">1  100</option>
+      <option value="100">101  200</option>
+      <option value="200">201  300</option>
+      <option value="300">301  400</option>
+      <option value="400">401  500</option>
+      <option value="500">501  600</option>
+      <option value="600">601  700</option>
+      <option value="700">701  800</option>
+      <option value="800">801  900</option>
+      <option value="900">901  1000</option>
+    </select>
+  </div>
+
+  <div class="card tableWrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th><th>Prénom</th><th>Adresse</th><th>Ville</th><th>CP</th>
+          <th>Fixe</th><th>Mobile</th><th>RDV</th><th>Rappel</th>
+          <th>Statut</th><th>Rep1</th><th>Rep2</th><th>Commentaire</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"><tr><td colspan="14" class="small">Chargement…</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- FORM -->
+  <div id="formCard" class="card hidden">
+    <b id="formTitle">Ajouter</b>
+    <div class="grid" style="margin-top:10px">
+      <input id="f_nom" placeholder="Nom">
+      <input id="f_prenom" placeholder="Prénom">
+      <input id="f_adresse" placeholder="Adresse">
+      <input id="f_ville" placeholder="Ville">
+      <input id="f_cp" placeholder="CP">
+      <input id="f_fixe" placeholder="Fixe">
+      <input id="f_mobile" placeholder="Mobile">
+      <input id="f_rdv" type="date">
+      <input id="f_rappel" type="date">
+      <select id="f_statut">
+        <option>À appeler</option><option>RDV</option><option>À rappeler</option>
+        <option>Refus</option><option>Hors cible</option>
+      </select>
+      <input id="f_rep1" placeholder="Réponse 1">
+      <input id="f_rep2" placeholder="Réponse 2">
+    </div>
+    <textarea id="f_commentaire" placeholder="Commentaire"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="primary" onclick="save()">Enregistrer</button>
+      <button onclick="closeForm()">Annuler</button>
+    </div>
+  </div>
+
+  <!-- IMPORT -->
+  <div id="importCard" class="card hidden">
+    <b>Import (TXT / CSV / XLS) + mapping manuel</b>
+
+    <div class="row" style="margin-top:10px">
+      <label class="small">Format</label>
+      <select id="fmt">
+        <option value="csv">CSV</option>
+        <option value="txt">TXT</option>
+        <option value="xls">XLS/XLSX</option>
+      </select>
+
+      <label class="small">Max import</label>
+      <input id="limitImport" type="number" value="500" min="1" style="max-width:120px">
+
+      <label class="small">TXT séparateur</label>
+      <select id="txtSep">
+        <option value="auto" selected>Auto</option>
+        <option value="tab">Tab</option>
+        <option value=";">;</option>
+        <option value=",">,</option>
+        <option value="|">|</option>
+        <option value="space">Espaces</option>
+      </select>
+
+      <label class="small">TXT : 1ère ligne = en-têtes</label>
+      <select id="txtHasHeader">
+        <option value="yes" selected>Oui</option>
+        <option value="no">Non</option>
+      </select>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <input type="file" id="file">
+      <button onclick="loadFile()">Charger fichier</button>
+      <span id="importInfo" class="small"></span>
+    </div>
+
+    <div class="map" id="mappingBox"></div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="primary" onclick="validateImport()">Valider import</button>
+      <button onclick="closeImport()">Fermer</button>
+    </div>
+
+    <div class="preview" id="preview">Aperçu…</div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, updateDoc, deleteDoc, doc,
+    onSnapshot, serverTimestamp, getDocs, query, limit
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+  //  Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyA-G8P5NokxI6ZaIOMroQrH4x8mp_Q2dgg",
+    authDomain: "axokit-crm-ecoles-e56ab.firebaseapp.com",
+    projectId: "axokit-crm-ecoles-e56ab"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  //  Base indépendante
+  const COLLECTION = "crm_base1";
+  const colRef = collection(db, COLLECTION);
+
+  const $ = (id)=>document.getElementById(id);
+  const FIELDS = [
+    {k:"nom",lbl:"Nom"},{k:"prenom",lbl:"Prénom"},{k:"adresse",lbl:"Adresse"},{k:"ville",lbl:"Ville"},
+    {k:"cp",lbl:"CP"},{k:"fixe",lbl:"Fixe"},{k:"mobile",lbl:"Mobile"},{k:"rdv",lbl:"RDV"},
+    {k:"rappel",lbl:"Rappel"},{k:"statut",lbl:"Statut"},{k:"rep1",lbl:"Rep1"},{k:"rep2",lbl:"Rep2"},
+    {k:"commentaire",lbl:"Commentaire"}
+  ];
+  const clean = (v)=> (v==null?"":(""+v)).replace(/\u00a0/g," ").trim();
+  const esc = (s)=> (s==null?"":(""+s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+  let ALL = [];
+  let START = 0;
+  const LIMIT = 100;
+  let EDIT_ID = null;
+
+  $("fb").textContent = "Firebase : connexion…";
+  onSnapshot(colRef, (snap)=>{
+    ALL = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    $("total").textContent = ALL.length;
+    $("fb").textContent = "Firebase : OK";
+    render();
+  }, (e)=>{
+    console.error(e);
+    $("fb").textContent = "Firebase : ERREUR (https / rules)";
+  });
+
+  function render(){
+    const slice = ALL.slice(START, START+LIMIT);
+    const tb = $("tbody");
+    if(!slice.length){
+      tb.innerHTML = `<tr><td colspan="14" class="small">Vide (dans cette tranche)</td></tr>`;
+      return;
+    }
+    tb.innerHTML = slice.map(x=>`
+      <tr>
+        <td>${esc(x.nom||"")}</td><td>${esc(x.prenom||"")}</td>
+        <td>${esc(x.adresse||"")}</td><td>${esc(x.ville||"")}</td>
+        <td>${esc(x.cp||"")}</td><td>${esc(x.fixe||"")}</td>
+        <td>${esc(x.mobile||"")}</td><td>${esc(x.rdv||"")}</td>
+        <td>${esc(x.rappel||"")}</td><td>${esc(x.statut||"")}</td>
+        <td>${esc(x.rep1||"")}</td><td>${esc(x.rep2||"")}</td>
+        <td>${esc(x.commentaire||"")}</td>
+        <td>
+          <button onclick="editRow('${x.id}')"></button>
+          <button onclick="delRow('${x.id}')"></button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  //  Range
+  window.applyRange = ()=>{
+    START = parseInt($("rangeSelect").value, 10) || 0;
+    $("rangeLabel").textContent = (START+1)+"  "+(START+100);
+    render();
+  };
+
+  //  Form
+  window.openForm = ()=>{
+    EDIT_ID = null;
+    $("formTitle").textContent = "Ajouter";
+    ["nom","prenom","adresse","ville","cp","fixe","mobile","rdv","rappel","rep1","rep2","commentaire"].forEach(k=>{
+      const el = $("f_"+k); if(el) el.value="";
+    });
+    $("f_statut").value = "À appeler";
+    $("formCard").classList.remove("hidden");
+  };
+  window.closeForm = ()=> $("formCard").classList.add("hidden");
+
+  window.editRow = (id)=>{
+    const x = ALL.find(a=>a.id===id);
+    if(!x) return;
+    EDIT_ID = id;
+    $("formTitle").textContent = "Modifier";
+    $("f_nom").value = x.nom||"";
+    $("f_prenom").value = x.prenom||"";
+    $("f_adresse").value = x.adresse||"";
+    $("f_ville").value = x.ville||"";
+    $("f_cp").value = x.cp||"";
+    $("f_fixe").value = x.fixe||"";
+    $("f_mobile").value = x.mobile||"";
+    $("f_rdv").value = x.rdv||"";
+    $("f_rappel").value = x.rappel||"";
+    $("f_statut").value = x.statut||"À appeler";
+    $("f_rep1").value = x.rep1||"";
+    $("f_rep2").value = x.rep2||"";
+    $("f_commentaire").value = x.commentaire||"";
+    $("formCard").classList.remove("hidden");
+  };
+
+  window.save = async ()=>{
+    const o = {
+      nom: clean($("f_nom").value),
+      prenom: clean($("f_prenom").value),
+      adresse: clean($("f_adresse").value),
+      ville: clean($("f_ville").value),
+      cp: clean($("f_cp").value),
+      fixe: clean($("f_fixe").value),
+      mobile: clean($("f_mobile").value),
+      rdv: clean($("f_rdv").value),
+      rappel: clean($("f_rappel").value),
+      statut: clean($("f_statut").value),
+      rep1: clean($("f_rep1").value),
+      rep2: clean($("f_rep2").value),
+      commentaire: clean($("f_commentaire").value),
+      updatedAt: serverTimestamp()
+    };
+    if(EDIT_ID){
+      await updateDoc(doc(db, COLLECTION, EDIT_ID), o);
+    }else{
+      await addDoc(colRef, {...o, createdAt: serverTimestamp()});
+    }
+    closeForm();
+  };
+
+  window.delRow = async (id)=>{
+    if(confirm("Supprimer ?")){
+      await deleteDoc(doc(db, COLLECTION, id));
+    }
+  };
+
+  //  Delete all (batch 500)
+  window.deleteAll = async ()=>{
+    const pass = prompt("Mot de passe admin");
+    if(pass !== "admin2026"){ alert("Refusé"); return; }
+    if(!confirm("SUPPRIMER TOUTE LA BASE 1 ?")) return;
+
+    let total = 0;
+    while(true){
+      const snap = await getDocs(query(colRef, limit(500)));
+      if(snap.empty) break;
+      for(const d of snap.docs){
+        await deleteDoc(doc(db, COLLECTION, d.id));
+        total++;
+      }
+    }
+    alert("Terminé. Supprimés: " + total);
+  };
+
+  //  Export CSV
+  window.exportCSV = ()=>{
+    const cols = FIELDS.map(f=>f.k);
+    let csv = cols.join(";") + "\n";
+    ALL.forEach(x=>{
+      csv += cols.map(k=>{
+        const v = (x?.[k] ?? "").toString().replace(/"/g,'""');
+        return `"${v}"`;
+      }).join(";") + "\n";
+    });
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+    a.download="base1.csv";
+    a.click();
+  };
+
+  //  Import (TXT/CSV/XLS) + mapping
+  let importHeaders = [];
+  let importRows = [];
+
+  window.openImport = ()=>{
+    $("importInfo").textContent = "";
+    $("preview").textContent = "Aperçu…";
+    $("mappingBox").innerHTML = "";
+    $("importCard").classList.remove("hidden");
+  };
+  window.closeImport = ()=> $("importCard").classList.add("hidden");
+
+  function detectDelim(line){
+    const cands = ["; ", ";", ",", "\t", "|"];
+    let best = {d:";", n:1};
+    for(const d of cands){
+      const n = line.split(d).length;
+      if(n > best.n) best = {d, n};
+    }
+    return best.n < 2 ? "space" : best.d;
+  }
+  function splitLine(line, sep){
+    if(sep==="space") return line.trim().split(/\s+/);
+    if(sep==="tab") return line.split("\t");
+    if(sep==="auto") return splitLine(line, detectDelim(line));
+    return line.split(sep);
+  }
+  function normalizeHeaders(arr){
+    return arr.map(x=>(""+x).trim()).filter(Boolean);
+  }
+  function buildMappingUI(){
+    const box = $("mappingBox");
+    box.innerHTML = "";
+    FIELDS.forEach(f=>{
+      const sel = document.createElement("select");
+      sel.dataset.field = f.k;
+      sel.innerHTML = `<option value="">-- ${f.lbl} --</option>` +
+        importHeaders.map((h,i)=>`<option value="${i}">${esc(h)}</option>`).join("");
+      box.appendChild(sel);
+    });
+  }
+  function showPreview(){
+    const out = [];
+    out.push("En-têtes: " + importHeaders.join(" | "));
+    out.push("Aperçu (5 lignes):");
+    for(let i=0;i<Math.min(5, importRows.length);i++){
+      out.push(importRows[i].map(v=>clean(v)).join(" | "));
+    }
+    $("preview").textContent = out.join("\n");
+  }
+
+  window.loadFile = async ()=>{
+    const f = $("file").files[0];
+    if(!f){ alert("Choisir un fichier"); return; }
+
+    importHeaders = [];
+    importRows = [];
+    $("importInfo").textContent = "Chargement…";
+
+    try{
+      const fmt = $("fmt").value;
+
+      if(fmt==="xls"){
+        const buf = await f.arrayBuffer();
+        const wb = XLSX.read(buf,{type:"array"});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const arr = XLSX.utils.sheet_to_json(ws,{header:1, defval:""});
+        const hdr = normalizeHeaders(arr[0]||[]);
+        if(hdr.length){
+          importHeaders = hdr;
+          importRows = arr.slice(1).filter(r=>r.some(v=>(""+v).trim()!==""));
+        }else{
+          let maxLen=0;
+          arr.forEach(r=>maxLen=Math.max(maxLen,r.length));
+          importHeaders = Array.from({length:maxLen},(_,i)=>"col"+(i+1));
+          importRows = arr.filter(r=>r.some(v=>(""+v).trim()!==""));
+        }
+      }
+
+      if(fmt==="csv"){
+        const txt = await f.text();
+        const lines = txt.replace(/\r/g,"").split("\n").filter(l=>l.trim()!=="");
+        if(!lines.length) throw new Error("Fichier vide");
+        const delim = detectDelim(lines[0]);
+        importHeaders = normalizeHeaders(splitLine(lines[0], delim));
+        if(!importHeaders.length) throw new Error("En-têtes introuvables");
+        importRows = lines.slice(1).map(l=>splitLine(l, delim));
+      }
+
+      if(fmt==="txt"){
+        const txt = await f.text();
+        const lines = txt.replace(/\r/g,"").split("\n").filter(l=>l.trim()!=="");
+        if(!lines.length) throw new Error("Fichier vide");
+
+        const sepMode = $("txtSep").value;
+        const hasHeader = $("txtHasHeader").value;
+        const sep = (sepMode==="tab") ? "tab" : sepMode;
+
+        if(hasHeader==="yes"){
+          importHeaders = normalizeHeaders(splitLine(lines[0], sep));
+          if(!importHeaders.length) throw new Error("En-têtes TXT introuvables");
+          importRows = lines.slice(1).map(l=>splitLine(l, sep));
+        }else{
+          const cols = splitLine(lines[0], sep);
+          importHeaders = Array.from({length:cols.length},(_,i)=>"col"+(i+1));
+          importRows = lines.map(l=>splitLine(l, sep));
+        }
+      }
+
+      // Harmoniser longueur
+      const maxLen = importHeaders.length;
+      importRows = importRows.map(r=>{
+        const rr = r.slice(0, maxLen);
+        while(rr.length < maxLen) rr.push("");
+        return rr;
+      });
+
+      buildMappingUI();
+      showPreview();
+      $("importInfo").textContent = `OK • ${importRows.length} lignes • ${importHeaders.length} colonnes`;
+    }catch(e){
+      console.error(e);
+      $("importInfo").textContent = "Erreur: " + (e?.message || "chargement");
+      $("mappingBox").innerHTML = "";
+      $("preview").textContent = "";
+      importHeaders = []; importRows = [];
+    }
+  };
+
+  window.validateImport = async ()=>{
+    if(!importHeaders.length || !importRows.length){
+      alert("Charger un fichier d'abord");
+      return;
+    }
+
+    // lire mapping
+    const mapping = {};
+    document.querySelectorAll("#mappingBox select").forEach(sel=>{
+      if(sel.value !== ""){
+        mapping[sel.dataset.field] = parseInt(sel.value, 10);
+      }
+    });
+
+    if(Object.keys(mapping).length === 0){
+      alert("Mapper au moins un champ");
+      return;
+    }
+
+    const limitN = Math.max(1, parseInt($("limitImport").value || "500", 10));
+    const rows = importRows.slice(0, limitN);
+
+    let done = 0;
+    $("importInfo").textContent = "Import… 0/" + rows.length;
+
+    const CHUNK = 25; // anti crash Android
+    for(let i=0; i<rows.length; i+=CHUNK){
+      const part = rows.slice(i, i+CHUNK);
+
+      for(const row of part){
+        const obj = { createdAt: serverTimestamp(), statut:"À appeler" };
+        for(const field in mapping){
+          const idx = mapping[field];
+          obj[field] = clean(row[idx] ?? "");
+        }
+        await addDoc(colRef, obj);
+        done++;
+      }
+
+      $("importInfo").textContent = "Import… " + done + "/" + rows.length;
+      await new Promise(r=>setTimeout(r, 80));
+    }
+
+    $("importInfo").textContent = " Terminé: " + done + " importés";
+    alert("Import terminé: " + done);
+  };
+</script>
+</body>
+</html>
