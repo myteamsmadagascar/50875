@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>CRM – Base 1</title>
+<title>CRM â€“ Base 1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
@@ -33,11 +33,11 @@
 <header>
   <div class="row" style="justify-content:space-between">
     <div class="row">
-      <b>CRM – BASE 1</b>
+      <b>CRM â€“ BASE 1</b>
       <span class="pill">Collection : <b>crm_base1</b></span>
       <span class="pill">Total : <b id="total">0</b></span>
       <span class="pill" id="rangeLabel">1  100</span>
-      <span class="pill small" id="fb">Firebase : …</span>
+      <span class="pill small" id="fb">Firebase : â€¦</span>
     </div>
     <div class="row">
       <button onclick="location.href='index.html'">Retour index</button>
@@ -73,12 +73,12 @@
     <table>
       <thead>
         <tr>
-          <th>Nom</th><th>Prénom</th><th>Adresse</th><th>Ville</th><th>CP</th>
+          <th>Nom</th><th>PrÃ©nom</th><th>Adresse</th><th>Ville</th><th>CP</th>
           <th>Fixe</th><th>Mobile</th><th>RDV</th><th>Rappel</th>
           <th>Statut</th><th>Rep1</th><th>Rep2</th><th>Commentaire</th><th>Actions</th>
         </tr>
       </thead>
-      <tbody id="tbody"><tr><td colspan="14" class="small">Chargement…</td></tr></tbody>
+      <tbody id="tbody"><tr><td colspan="14" class="small">Chargementâ€¦</td></tr></tbody>
     </table>
   </div>
 
@@ -87,7 +87,7 @@
     <b id="formTitle">Ajouter</b>
     <div class="grid" style="margin-top:10px">
       <input id="f_nom" placeholder="Nom">
-      <input id="f_prenom" placeholder="Prénom">
+      <input id="f_prenom" placeholder="PrÃ©nom">
       <input id="f_adresse" placeholder="Adresse">
       <input id="f_ville" placeholder="Ville">
       <input id="f_cp" placeholder="CP">
@@ -96,11 +96,11 @@
       <input id="f_rdv" type="date">
       <input id="f_rappel" type="date">
       <select id="f_statut">
-        <option>À appeler</option><option>RDV</option><option>À rappeler</option>
+        <option>Ã€ appeler</option><option>RDV</option><option>Ã€ rappeler</option>
         <option>Refus</option><option>Hors cible</option>
       </select>
-      <input id="f_rep1" placeholder="Réponse 1">
-      <input id="f_rep2" placeholder="Réponse 2">
+      <input id="f_rep1" placeholder="RÃ©ponse 1">
+      <input id="f_rep2" placeholder="RÃ©ponse 2">
     </div>
     <textarea id="f_commentaire" placeholder="Commentaire"></textarea>
     <div class="row" style="margin-top:10px">
@@ -124,7 +124,7 @@
       <label class="small">Max import</label>
       <input id="limitImport" type="number" value="500" min="1" style="max-width:120px">
 
-      <label class="small">TXT séparateur</label>
+      <label class="small">TXT sÃ©parateur</label>
       <select id="txtSep">
         <option value="auto" selected>Auto</option>
         <option value="tab">Tab</option>
@@ -134,7 +134,7 @@
         <option value="space">Espaces</option>
       </select>
 
-      <label class="small">TXT : 1ère ligne = en-têtes</label>
+      <label class="small">TXT : 1Ã¨re ligne = en-tÃªtes</label>
       <select id="txtHasHeader">
         <option value="yes" selected>Oui</option>
         <option value="no">Non</option>
@@ -154,7 +154,7 @@
       <button onclick="closeImport()">Fermer</button>
     </div>
 
-    <div class="preview" id="preview">Aperçu…</div>
+    <div class="preview" id="preview">AperÃ§uâ€¦</div>
   </div>
 
 </div>
@@ -175,13 +175,13 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  //  Base indépendante
+  //  Base indÃ©pendante
   const COLLECTION = "crm_base1";
   const colRef = collection(db, COLLECTION);
 
   const $ = (id)=>document.getElementById(id);
   const FIELDS = [
-    {k:"nom",lbl:"Nom"},{k:"prenom",lbl:"Prénom"},{k:"adresse",lbl:"Adresse"},{k:"ville",lbl:"Ville"},
+    {k:"nom",lbl:"Nom"},{k:"prenom",lbl:"PrÃ©nom"},{k:"adresse",lbl:"Adresse"},{k:"ville",lbl:"Ville"},
     {k:"cp",lbl:"CP"},{k:"fixe",lbl:"Fixe"},{k:"mobile",lbl:"Mobile"},{k:"rdv",lbl:"RDV"},
     {k:"rappel",lbl:"Rappel"},{k:"statut",lbl:"Statut"},{k:"rep1",lbl:"Rep1"},{k:"rep2",lbl:"Rep2"},
     {k:"commentaire",lbl:"Commentaire"}
@@ -194,7 +194,7 @@
   const LIMIT = 100;
   let EDIT_ID = null;
 
-  $("fb").textContent = "Firebase : connexion…";
+  $("fb").textContent = "Firebase : connexionâ€¦";
   onSnapshot(colRef, (snap)=>{
     ALL = snap.docs.map(d=>({id:d.id, ...d.data()}));
     $("total").textContent = ALL.length;
@@ -243,7 +243,7 @@
     ["nom","prenom","adresse","ville","cp","fixe","mobile","rdv","rappel","rep1","rep2","commentaire"].forEach(k=>{
       const el = $("f_"+k); if(el) el.value="";
     });
-    $("f_statut").value = "À appeler";
+    $("f_statut").value = "Ã€ appeler";
     $("formCard").classList.remove("hidden");
   };
   window.closeForm = ()=> $("formCard").classList.add("hidden");
@@ -262,7 +262,7 @@
     $("f_mobile").value = x.mobile||"";
     $("f_rdv").value = x.rdv||"";
     $("f_rappel").value = x.rappel||"";
-    $("f_statut").value = x.statut||"À appeler";
+    $("f_statut").value = x.statut||"Ã€ appeler";
     $("f_rep1").value = x.rep1||"";
     $("f_rep2").value = x.rep2||"";
     $("f_commentaire").value = x.commentaire||"";
@@ -303,7 +303,7 @@
   //  Delete all (batch 500)
   window.deleteAll = async ()=>{
     const pass = prompt("Mot de passe admin");
-    if(pass !== "admin2026"){ alert("Refusé"); return; }
+    if(pass !== "admin2026"){ alert("RefusÃ©"); return; }
     if(!confirm("SUPPRIMER TOUTE LA BASE 1 ?")) return;
 
     let total = 0;
@@ -315,7 +315,7 @@
         total++;
       }
     }
-    alert("Terminé. Supprimés: " + total);
+    alert("TerminÃ©. SupprimÃ©s: " + total);
   };
 
   //  Export CSV
@@ -340,7 +340,7 @@
 
   window.openImport = ()=>{
     $("importInfo").textContent = "";
-    $("preview").textContent = "Aperçu…";
+    $("preview").textContent = "AperÃ§uâ€¦";
     $("mappingBox").innerHTML = "";
     $("importCard").classList.remove("hidden");
   };
@@ -377,8 +377,8 @@
   }
   function showPreview(){
     const out = [];
-    out.push("En-têtes: " + importHeaders.join(" | "));
-    out.push("Aperçu (5 lignes):");
+    out.push("En-tÃªtes: " + importHeaders.join(" | "));
+    out.push("AperÃ§u (5 lignes):");
     for(let i=0;i<Math.min(5, importRows.length);i++){
       out.push(importRows[i].map(v=>clean(v)).join(" | "));
     }
@@ -391,7 +391,7 @@
 
     importHeaders = [];
     importRows = [];
-    $("importInfo").textContent = "Chargement…";
+    $("importInfo").textContent = "Chargementâ€¦";
 
     try{
       const fmt = $("fmt").value;
@@ -419,7 +419,7 @@
         if(!lines.length) throw new Error("Fichier vide");
         const delim = detectDelim(lines[0]);
         importHeaders = normalizeHeaders(splitLine(lines[0], delim));
-        if(!importHeaders.length) throw new Error("En-têtes introuvables");
+        if(!importHeaders.length) throw new Error("En-tÃªtes introuvables");
         importRows = lines.slice(1).map(l=>splitLine(l, delim));
       }
 
@@ -434,7 +434,7 @@
 
         if(hasHeader==="yes"){
           importHeaders = normalizeHeaders(splitLine(lines[0], sep));
-          if(!importHeaders.length) throw new Error("En-têtes TXT introuvables");
+          if(!importHeaders.length) throw new Error("En-tÃªtes TXT introuvables");
           importRows = lines.slice(1).map(l=>splitLine(l, sep));
         }else{
           const cols = splitLine(lines[0], sep);
@@ -453,7 +453,7 @@
 
       buildMappingUI();
       showPreview();
-      $("importInfo").textContent = `OK • ${importRows.length} lignes • ${importHeaders.length} colonnes`;
+      $("importInfo").textContent = `OK â€¢ ${importRows.length} lignes â€¢ ${importHeaders.length} colonnes`;
     }catch(e){
       console.error(e);
       $("importInfo").textContent = "Erreur: " + (e?.message || "chargement");
@@ -486,14 +486,14 @@
     const rows = importRows.slice(0, limitN);
 
     let done = 0;
-    $("importInfo").textContent = "Import… 0/" + rows.length;
+    $("importInfo").textContent = "Importâ€¦ 0/" + rows.length;
 
     const CHUNK = 25; // anti crash Android
     for(let i=0; i<rows.length; i+=CHUNK){
       const part = rows.slice(i, i+CHUNK);
 
       for(const row of part){
-        const obj = { createdAt: serverTimestamp(), statut:"À appeler" };
+        const obj = { createdAt: serverTimestamp(), statut:"Ã€ appeler" };
         for(const field in mapping){
           const idx = mapping[field];
           obj[field] = clean(row[idx] ?? "");
@@ -502,12 +502,12 @@
         done++;
       }
 
-      $("importInfo").textContent = "Import… " + done + "/" + rows.length;
+      $("importInfo").textContent = "Importâ€¦ " + done + "/" + rows.length;
       await new Promise(r=>setTimeout(r, 80));
     }
 
-    $("importInfo").textContent = " Terminé: " + done + " importés";
-    alert("Import terminé: " + done);
+    $("importInfo").textContent = " TerminÃ©: " + done + " importÃ©s";
+    alert("Import terminÃ©: " + done);
   };
 </script>
 </body>
